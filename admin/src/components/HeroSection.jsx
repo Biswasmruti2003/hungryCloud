@@ -61,7 +61,7 @@ const HeroSection = () => {
       ref={containerRef}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="relative w-full min-h-screen overflow-hidden px-4 pt-10 pb-28 sm:pb-32" // increased bottom padding
+      className="relative w-full h-[50vh] overflow-hidden px-4 pt-10 pb-28 sm:pb-10" // increased bottom padding
     >
       {/* Background */}
       <div className="absolute inset-0 z-0">
@@ -73,7 +73,7 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-tr from-white/80 via-green-50/80 to-orange-50/80 backdrop-blur-sm" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto h-full flex flex-col justify-center">
+      <div className="relative z-10 max-w-7xl mx-auto h-full flex flex-col justify-center item-center">
         <AnimatePresence mode="wait">
           {slideIndex === 0 ? (
             <motion.div
@@ -158,7 +158,7 @@ const HeroSection = () => {
                 <img
                   src="https://img.freepik.com/free-photo/medium-shot-happy-doctor-with-orange-kiwi_23-2148302076.jpg?semt=ais_hybrid&w=740"
                   alt="Nutritionist"
-                  className="w-full h-64 sm:h-80 md:h-96 object-cover rounded-xl shadow-2xl"
+                  className="w-full h-64 sm:h-80 md:h-76 object-cover rounded-xl shadow-2xl"
                 />
               </motion.div>
 

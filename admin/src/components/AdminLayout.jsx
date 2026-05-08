@@ -6,7 +6,7 @@ const AdminLayout = () => {
   return (
     <div className="flex">
       <AdminSidebar />
-      <main className="flex-1 bg-gradient-to-br from-green-50 via-white to-orange-50 min-h-screen p-6">
+      <main className="flex-1 min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50 p-4 sm:p-6">
         <Outlet />
       </main>
     </div>

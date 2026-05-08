@@ -1,26 +1,36 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-
-const durations = [
-  { label: "3 day", veg: 249, nonVeg: 279, days: 3 },
-  { label: "7 day", veg: 249, nonVeg: 279, days: 7 },
-  { label: "21 day", veg: 249, nonVeg: 279, days: 21 },
-  { label: "28 day", veg: 239, nonVeg: 269, days: 28 },
-];
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const dayList = [
-  "Monday", "Tuesday", "Wednesday", "Thursday",
-  "Friday", "Saturday", "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
 ];
 
-const HighProteinPlanCard = () => {
+export default function PlanTemplate({
+  planLabel = "Meal plan",
+  heading,
+  description,
+  planName,
+  durations,
+  images,
+  heroOverlayText = "Fresh • Macro-balanced • Delivered daily",
+  primaryBadgeText,
+  vegBadgeText = "Pure Veg",
+}) {
   const [mealOption, setMealOption] = useState("Veg");
   const [slot, setSlot] = useState("Lunch");
   const [daysOption, setDaysOption] = useState("7 days a week");
   const [selectedDays, setSelectedDays] = useState([]);
-  const [duration, setDuration] = useState(durations[1]); // Default 7 day
-  const [orderDate, setOrderDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [duration, setDuration] = useState(durations?.[1] ?? durations?.[0]);
+  const [orderDate, setOrderDate] = useState(() =>
+    new Date().toISOString().slice(0, 10),
+  );
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,11 +40,12 @@ const HighProteinPlanCard = () => {
   const tagColor = isVeg ? "bg-emerald-600" : "bg-rose-600";
   const tagText = isVeg ? "Veg" : "Non-Veg";
 
-  // ✅ Helper to get consecutive days from a start date
   const getConsecutiveDays = (startDate, count) => {
     if (!startDate) return [];
-    const startDayName = new Date(startDate).toLocaleDateString("en-US", { weekday: "long" });
-    const startIndex = dayList.findIndex(day => day === startDayName);
+    const startDayName = new Date(startDate).toLocaleDateString("en-US", {
+      weekday: "long",
+    });
+    const startIndex = dayList.findIndex((day) => day === startDayName);
     if (startIndex === -1) return [];
     const result = [];
     for (let i = 0; i < count; i++) {
@@ -51,28 +62,26 @@ const HighProteinPlanCard = () => {
     }
   };
 
-  const getPricePerMeal = () => (isVeg ? duration.veg : duration.nonVeg);
+  const getPricePerMeal = () => (isVeg ? duration?.veg : duration?.nonVeg);
   const isDoubleMeal = slot === "Lunch + Dinner";
   const finalPrice = isDoubleMeal ? getPricePerMeal() * 2 : getPricePerMeal();
 
   useEffect(() => {
-    if (daysOption === "7 days a week") {
-      setSelectedDays([]);
-    }
+    if (daysOption === "7 days a week") setSelectedDays([]);
   }, [daysOption]);
 
   useEffect(() => {
-    if (daysOption === "Custom") {
-      const count = selectedDays.length;
-      if (count === 3) {
-        setDuration(durations[0]);
-      } else if (count === 5) {
-        setDuration(durations[1]);
-      } else if (count === 7) {
-        setDuration(durations[2]);
-      }
-    }
-  }, [selectedDays, daysOption]);
+    if (daysOption !== "Custom") return;
+    const count = selectedDays.length;
+    if (count === 3) setDuration(durations[0]);
+    else if (count === 5) setDuration(durations[1]);
+    else if (count === 7) setDuration(durations[2]);
+  }, [selectedDays, daysOption, durations]);
+
+  const primaryBadge = useMemo(
+    () => primaryBadgeText ?? heading,
+    [primaryBadgeText, heading],
+  );
 
   const handleNavigate = () => {
     const stateData = {
@@ -81,20 +90,16 @@ const HighProteinPlanCard = () => {
       duration,
       daysOption,
       selectedDays: daysOption === "Custom" ? selectedDays : dayList,
-      planName: "High Protein Plan",
+      planName,
     };
     navigate("/subscribe-confirm", { state: stateData });
   };
 
   const handleProtectedAction = () => {
-    if (isLoggedIn) {
-      handleNavigate();
-    } else {
-      navigate("/login", { state: { from: location.pathname } });
-    }
+    if (isLoggedIn) handleNavigate();
+    else navigate("/login", { state: { from: location.pathname } });
   };
 
-  // ✅ Updated to use consecutive days from order date
   const start3DayTrial = () => {
     const threeDayDuration = durations.find((d) => d.label === "3 day");
     navigate("/subscribe-confirm", {
@@ -104,7 +109,7 @@ const HighProteinPlanCard = () => {
         duration: threeDayDuration,
         daysOption: "Custom",
         selectedDays: getConsecutiveDays(orderDate, 3),
-        planName: "High Protein Plan",
+        planName,
       },
     });
   };
@@ -118,13 +123,13 @@ const HighProteinPlanCard = () => {
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">
-              Meal plan
+              {planLabel}
             </p>
             <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-gray-900 md:text-4xl">
-              High Protein
+              {heading}
             </h1>
             <p className="mt-2 max-w-xl text-sm text-gray-600 md:text-base">
-              Build lean muscle with chef-crafted, protein-forward meals — tailored to your slot and schedule.
+              {description}
             </p>
           </div>
           <button
@@ -136,8 +141,7 @@ const HighProteinPlanCard = () => {
           </button>
         </div>
 
-        <div className="max-w-7xl mx-auto flex flex-col gap-10 lg:flex-row lg:items-start ">
-          {/* Left — Visual */}
+        <div className="mx-auto flex max-w-7xl flex-col gap-10 lg:flex-row lg:items-start">
           <motion.div
             initial={{ x: -40, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -152,17 +156,13 @@ const HighProteinPlanCard = () => {
                   {tagText}
                 </div>
                 <img
-                  src={
-                    isVeg
-                      ? "https://cdn.betterme.world/articles/wp-content/uploads/2025/05/weekly-high-protein-meal-plan.png"
-                      : "https://images.ctfassets.net/eexbcii1ci83/6OtN4KptCymRLwU8FZahSb/c20dbf0a1ec9fc40441c3c3c3fc7857f/Indian_non-veg_diet_plan_for_weight_loss.jpg"
-                  }
-                  alt="High Protein Plan"
+                  src={isVeg ? images?.veg : images?.nonVeg}
+                  alt={planName}
                   className="h-full w-full object-cover"
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent p-5">
                   <p className="text-sm font-semibold text-white drop-shadow-sm">
-                    Fresh • Macro-balanced • Delivered daily
+                    {heroOverlayText}
                   </p>
                 </div>
               </div>
@@ -173,15 +173,16 @@ const HighProteinPlanCard = () => {
                   transition={{ delay: 0.2, duration: 0.5 }}
                   className="text-sm leading-relaxed text-gray-600"
                 >
-                  Ready to power up strength and stamina? HungryCloud&apos;s{" "}
-                  <span className="font-semibold text-gray-900">{mealOption}</span> High Protein Plan
-                  delivers a solid protein punch with every meal.
+                  HungryCloud&apos;s{" "}
+                  <span className="font-semibold text-gray-900">
+                    {mealOption}
+                  </span>{" "}
+                  {planName} is tailored to your slot and schedule.
                 </motion.p>
               </div>
             </div>
           </motion.div>
 
-          {/* Right — Configuration */}
           <motion.div
             initial={{ x: 40, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -196,14 +197,14 @@ const HighProteinPlanCard = () => {
                   </h2>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-100">
-                      High Protein
+                      {primaryBadge}
                     </span>
                     <span className="rounded-full bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-700 ring-1 ring-gray-100">
                       {slot}
                     </span>
                     {isVeg && (
                       <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-100">
-                        Pure Veg
+                        {vegBadgeText}
                       </span>
                     )}
                   </div>
@@ -218,19 +219,24 @@ const HighProteinPlanCard = () => {
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-100">
                     From
                   </p>
-                  <p className="text-2xl font-extrabold tabular-nums">₹{finalPrice}</p>
+                  <p className="text-2xl font-extrabold tabular-nums">
+                    ₹{finalPrice}
+                  </p>
                   <p className="text-xs text-emerald-100">per day</p>
                 </motion.div>
               </div>
 
               <div className="mt-8 space-y-6">
-                {/* Start date */}
                 <div className="rounded-2xl border border-gray-100 bg-gray-50/80 p-4">
-                  <label className="text-sm font-semibold text-gray-800" htmlFor="plan-start-date">
+                  <label
+                    className="text-sm font-semibold text-gray-800"
+                    htmlFor="plan-start-date"
+                  >
                     Plan start date
                   </label>
                   <p className="mt-1 text-xs text-gray-500">
-                    Used for 3-day trials and auto-selecting consecutive delivery days.
+                    Used for 3-day trials and auto-selecting consecutive delivery
+                    days.
                   </p>
                   <input
                     id="plan-start-date"
@@ -242,9 +248,10 @@ const HighProteinPlanCard = () => {
                   />
                 </div>
 
-                {/* Meal Option */}
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">Meal preference</p>
+                  <p className="text-sm font-semibold text-gray-800">
+                    Meal preference
+                  </p>
                   <div className="mt-2 inline-flex rounded-2xl border border-gray-200 bg-white p-1 shadow-sm">
                     {["Veg", "Non-Veg"].map((opt) => (
                       <button
@@ -265,9 +272,10 @@ const HighProteinPlanCard = () => {
                   </div>
                 </div>
 
-                {/* Delivery Slot */}
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">Delivery slot</p>
+                  <p className="text-sm font-semibold text-gray-800">
+                    Delivery slot
+                  </p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {["Lunch", "Dinner", "Lunch + Dinner"].map((time) => (
                       <button
@@ -286,9 +294,10 @@ const HighProteinPlanCard = () => {
                   </div>
                 </div>
 
-                {/* Days Option */}
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">Delivery days</p>
+                  <p className="text-sm font-semibold text-gray-800">
+                    Delivery days
+                  </p>
                   <div className="mt-2 inline-flex flex-wrap gap-2 rounded-2xl border border-gray-200 bg-white p-1 shadow-sm">
                     {["7 days a week", "Custom"].map((option) => (
                       <button
@@ -310,7 +319,6 @@ const HighProteinPlanCard = () => {
                   </div>
                 </div>
 
-                {/* Custom Days */}
                 <AnimatePresence>
                   {daysOption === "Custom" && (
                     <motion.div
@@ -348,7 +356,6 @@ const HighProteinPlanCard = () => {
                   )}
                 </AnimatePresence>
 
-                {/* Duration */}
                 <div>
                   <label
                     htmlFor="duration-select"
@@ -358,22 +365,24 @@ const HighProteinPlanCard = () => {
                   </label>
                   <select
                     id="duration-select"
-                    value={duration.label}
+                    value={duration?.label}
                     onChange={(e) => {
-                      const selected = durations.find((d) => d.label === e.target.value);
-                      if (selected) {
-                        setDuration(selected);
-                        if (selected.label === "3 day") {
-                          setDaysOption("Custom");
-                          setSelectedDays(getConsecutiveDays(orderDate, 3));
-                        }
+                      const selected = durations.find(
+                        (d) => d.label === e.target.value,
+                      );
+                      if (!selected) return;
+                      setDuration(selected);
+                      if (selected.label === "3 day") {
+                        setDaysOption("Custom");
+                        setSelectedDays(getConsecutiveDays(orderDate, 3));
                       }
                     }}
                     className="mt-2 w-full cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 outline-none ring-emerald-500/0 transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30"
                   >
                     {durations.map((d) => {
                       const perDay =
-                        (isVeg ? d.veg : d.nonVeg) * (slot === "Lunch + Dinner" ? 2 : 1);
+                        (isVeg ? d.veg : d.nonVeg) *
+                        (slot === "Lunch + Dinner" ? 2 : 1);
                       return (
                         <option key={d.label} value={d.label}>
                           {d.label} — ₹{perDay} / day
@@ -406,6 +415,5 @@ const HighProteinPlanCard = () => {
       </div>
     </section>
   );
-};
+}
 
-export default HighProteinPlanCard;

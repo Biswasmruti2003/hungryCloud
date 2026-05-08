@@ -104,13 +104,13 @@ const MyMealPlans = () => {
   const themeColor = isVeg ? "green" : "red";
 
   return (
-    <div className="bg-gradient-to-br from-orange-50 via-white to-green-50 min-h-screen p-6">
+    <div className="max-w-7xl mx-auto py-16 bg-gradient-to-br from-orange-50 via-white to-green-50 min-h-screen p-6">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="flex items-center justify-between mb-6"
+        className="flex items-center justify-between mb-8"
       >
         <h1 className="text-3xl font-bold">My Meal Plans</h1>
         <div className="flex gap-3">
@@ -131,7 +131,7 @@ const MyMealPlans = () => {
       </motion.div>
 
       {/* Grid View */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
         {Object.entries(meals).map(([day, data], index) => (
           <motion.div
             key={day}

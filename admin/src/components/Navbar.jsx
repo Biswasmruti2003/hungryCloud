@@ -96,7 +96,6 @@ const Navbar = () => {
       Home: "/",
       "Meal Plans": "/meal-plan",
       Recipes: "/recipes",
-      Blog: "/blog",
       About: "/about",
     };
     navigate(mapping[item]);
@@ -140,12 +139,12 @@ const Navbar = () => {
         >
           <img
             src={food1}
-            alt="NutriBlend"
+            alt="HungryCloud"
             className="w-10 h-10 sm:w-12 sm:h-12 object-scale-down"
           />
           <div className="flex flex-col">
             <span className="text-lg sm:text-xl font-bold text-green-700">
-              NutriBlend
+              HungryCloud
             </span>
             <span className="text-[10px] sm:text-xs text-gray-500 leading-tight">
               Healthy Food For Happy Life
@@ -155,7 +154,7 @@ const Navbar = () => {
 
         {/* Desktop Nav Links */}
         <ul className="hidden md:flex items-center gap-5 text-sm font-semibold">
-          {["Home", "Meal Plans", "Recipes", "Blog", "About"].map((item) => (
+          {["Home", "Meal Plans", "Recipes", "About"].map((item) => (
             <li
               key={item}
               onClick={() => handleNavClick(item)}
@@ -210,7 +209,7 @@ const Navbar = () => {
       {/* Mobile Nav Menu */}
       {menuOpen && (
         <div className="md:hidden bg-white shadow-lg px-6 py-6 space-y-4">
-          {["Home", "Meal Plans", "Recipes", "Blog", "About"].map((item) => (
+          {["Home", "Meal Plans", "Recipes", "About"].map((item) => (
             <div
               key={item}
               onClick={() => handleNavClick(item)}

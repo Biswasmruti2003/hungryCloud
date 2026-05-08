@@ -2,7 +2,16 @@
 
 import { motion } from "framer-motion";
 import { useEffect } from "react";
-import { FaLock, FaUserShield, FaClipboardList } from "react-icons/fa";
+import { useState } from "react";
+import {
+  FaLock,
+  FaUserShield,
+  FaClipboardList,
+  FaChevronDown,
+  FaShieldAlt,
+  FaCookieBite,
+  FaUserEdit,
+} from "react-icons/fa";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 30 },
@@ -26,12 +35,12 @@ const scaleFade = {
   },
 };
 
-const icons = [FaUserShield, FaLock, FaClipboardList];
-
 const PrivacyPolicy = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const [openIndex, setOpenIndex] = useState(0);
 
   const sections = [
     {
@@ -82,72 +91,162 @@ const PrivacyPolicy = () => {
   ];
 
   return (
-    <div className="relative min-h-screen py-20 px-6 md:px-24 bg-gradient-to-br from-green-50 via-white to-orange-50 text-gray-800 overflow-hidden">
-      {/* Animated Floating Background Circles */}
-      <div className="absolute top-0 left-0 w-80 h-80 bg-green-100 opacity-20 blur-3xl rounded-full animate-pulse -z-10" />
-      <div className="absolute bottom-0 right-0 w-80 h-80 bg-orange-100 opacity-20 blur-3xl rounded-full animate-pulse -z-10" />
+    <div className="relative min-h-screen bg-gradient-to-br from-green-50 via-white to-orange-50 text-gray-800 overflow-hidden">
+      {/* Background */}
+      <div className="absolute top-0 left-0 w-80 h-80 bg-green-100 opacity-25 blur-3xl rounded-full animate-pulse -z-10" />
+      <div className="absolute bottom-0 right-0 w-80 h-80 bg-orange-100 opacity-25 blur-3xl rounded-full animate-pulse -z-10" />
+      <div className="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-white/70 to-transparent -z-10" />
 
-      {/* Title with Icon Animation */}
-      <motion.div
-        variants={scaleFade}
-        initial="hidden"
-        animate="visible"
-        className="text-center mb-10"
-      >
-        <h1 className="text-4xl md:text-5xl font-extrabold text-green-800 mb-2 drop-shadow-md">
-          Privacy Policy
-        </h1>
-        <p className="text-sm text-gray-500 italic">Your data. Your control. Our commitment.</p>
-        <div className="flex justify-center gap-6 mt-4">
-          {icons.map((Icon, i) => (
-            <motion.div
-              key={i}
-              className="p-3 rounded-full bg-white shadow-md hover:scale-110 transition"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 + i * 0.2 }}
-            >
-              <Icon className="text-green-600 text-xl" />
-            </motion.div>
-          ))}
+      <div className="max-w-6xl mx-auto px-6 md:px-10 lg:px-12 py-16 md:py-20">
+        {/* Hero */}
+        <motion.div
+          variants={scaleFade}
+          initial="hidden"
+          animate="visible"
+          className="mx-auto max-w-3xl text-center"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-green-100 shadow-sm backdrop-blur">
+            <FaShieldAlt className="text-green-700" />
+            <span className="text-xs sm:text-sm font-semibold text-green-800">
+              Your data. Your control.
+            </span>
+          </div>
+
+          <h1 className="mt-5 text-4xl md:text-5xl font-extrabold tracking-tight text-green-900">
+            Privacy Policy
+          </h1>
+          <p className="mt-3 text-gray-600 md:text-lg">
+            How we collect, use, and protect your information while you use HungryCloud.
+          </p>
+
+        </motion.div>
+
+        {/* Summary Cards */}
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            {
+              title: "Security",
+              value: "Encryption + SSL",
+              desc: "We use industry-standard security protocols to protect your data.",
+              icon: FaLock,
+            },
+            {
+              title: "Your control",
+              value: "Access & deletion",
+              desc: "You can review, update, or request deletion of your information.",
+              icon: FaUserEdit,
+            },
+            {
+              title: "Cookies",
+              value: "Optional tracking",
+              desc: "Cookies help improve experience and performance; you can disable them in your browser.",
+              icon: FaCookieBite,
+            },
+          ].map((card, i) => {
+            const Icon = card.icon;
+            return (
+              <motion.div
+                key={card.title}
+                variants={fadeIn}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                custom={i + 1}
+                className="rounded-3xl bg-white/90 border border-green-100 shadow-lg backdrop-blur p-5"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-green-50 border border-green-100 flex items-center justify-center shadow-sm">
+                      <Icon className="text-green-700 text-xl" size={24} />
+                    </div>
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                      {card.title}
+                    </p>
+                    <p className="mt-1 text-2xl font-extrabold text-green-900">
+                      {card.value}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="mt-3 text-sm text-gray-600 leading-relaxed">{card.desc}</p>
+              </motion.div>
+            );
+          })}
         </div>
-      </motion.div>
 
-      {/* Sections */}
-      <div className="max-w-5xl mx-auto space-y-10">
-        {sections.map((section, index) => (
+        {/* Accordion */}
+        <div className="mt-10 max-w-7xl mx-auto">
           <motion.div
-            key={index}
             variants={fadeIn}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            custom={index + 1}
-            className="p-6 bg-white/90 rounded-3xl shadow-xl border border-green-100 backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:scale-[1.01]"
+            custom={4}
+            className="rounded-3xl bg-white/90 border border-green-100 shadow-xl backdrop-blur overflow-hidden"
           >
-            <h2 className="text-2xl font-semibold text-green-600 mb-2">
-              {section.title}
-            </h2>
-            <p className="text-gray-700 leading-relaxed text-justify">
-              {section.content}
-            </p>
-          </motion.div>
-        ))}
-      </div>
+            <div className="px-6 py-5 border-b border-gray-100">
+              <h2 className="text-xl md:text-2xl font-bold text-green-900">
+                Policy details
+              </h2>
+              <p className="mt-1 text-sm text-gray-600">Tap a section to expand.</p>
+            </div>
 
-      {/* Footer */}
-      <motion.div
-        variants={fadeIn}
-        initial="hidden"
-        whileInView="visible"
-        custom={sections.length + 1}
-        className="mt-16 text-center text-sm text-gray-600"
-      >
-        <p className="text-green-900 font-medium">
-          Your trust is our priority. We ensure transparency and security every step of the way.
-        </p>
-        <p className="mt-1 text-xs text-gray-500 italic">Last updated: July 2025</p>
-      </motion.div>
+            <div className="divide-y divide-gray-100">
+              {sections.map((section, index) => {
+                const isOpen = openIndex === index;
+                return (
+                  <div key={section.title} className="px-6 py-5">
+                    <button
+                      type="button"
+                      onClick={() => setOpenIndex((prev) => (prev === index ? -1 : index))}
+                      className="w-full flex items-center justify-between gap-4 text-left"
+                      aria-expanded={isOpen}
+                    >
+                      <span className="text-base md:text-lg font-semibold text-green-800">
+                        {section.title}
+                      </span>
+                      <FaChevronDown
+                        className={`shrink-0 text-green-700 transition-transform duration-200 ${
+                          isOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    <motion.div
+                      initial={false}
+                      animate={isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pt-3 text-gray-700 leading-relaxed">
+                        {section.content}
+                      </div>
+                    </motion.div>
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+
+          {/* Footer Note */}
+          <motion.div
+            variants={fadeIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={5}
+            className="mt-10 text-center text-sm text-gray-600"
+          >
+            <p className="text-green-900 font-medium">
+              Your trust is our priority. We ensure transparency and security every step of the way.
+            </p>
+            <p className="mt-1 text-xs text-gray-500 italic">Last updated: July 2025</p>
+          </motion.div>
+        </div>
+      </div>
     </div>
   );
 };

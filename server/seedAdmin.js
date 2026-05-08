@@ -6,10 +6,7 @@ dotenv.config();
 
 const seedAdmin = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ MongoDB connected");
 
     // 1️⃣ Remove old admin@example.com if exists
@@ -26,10 +23,10 @@ const seedAdmin = async () => {
 
     // 3️⃣ Create new admin
     const newAdmin = new User({
-      name: "Admin",
-      email: "nutriadmin@gmail.com",
+      name: "HungryCloud",
+      email: "hungrycloud@gmail.com",
       phone: "9999999999",
-      password: "admin0000", // Plain text → will be hashed by schema's pre-save hook
+      password: "hungrycloud", // Plain text → will be hashed by schema's pre-save hook
       role: "admin",
     });
 

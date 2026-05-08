@@ -37,7 +37,7 @@ const Contact = () => {
         className="bg-white z-10 w-full max-w-3xl p-8 rounded-xl shadow-xl"
       >
         <h2 className="text-3xl sm:text-4xl font-bold text-green-800 mb-6 text-center">
-          Contact Nutriblend
+          Contact HungryCloud
         </h2>
 
         <p className="text-gray-600 text-center mb-8">
@@ -99,7 +99,7 @@ const Contact = () => {
             <a
               href="tel:+919090530409"
               className="text-green-700 hover:underline hover:text-green-900"
-              aria-label="Call Nutriblend"
+              aria-label="Call HungryCloud"
             >
               +91 9090530409
             </a>
@@ -109,11 +109,11 @@ const Contact = () => {
           <div className="flex flex-col items-center gap-2">
             <FaEnvelope className="text-green-600 text-xl" />
             <a
-              href="mailto:support@nutriblend.in"
+              href="mailto:support@hungrycloud.in"
               className="text-green-700 hover:underline hover:text-green-900"
-              aria-label="Email Nutriblend"
+              aria-label="Email HungryCloud"
             >
-              support@nutriblend.in
+              support@hungrycloud.in
             </a>
           </div>
 
@@ -125,7 +125,7 @@ const Contact = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="text-green-700 hover:underline hover:text-green-900"
-              aria-label="View Nutriblend address on map"
+              aria-label="View HungryCloud address on map"
             >
               Bhubaneswar, India
             </a>

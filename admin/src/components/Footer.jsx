@@ -4,6 +4,10 @@ import {
   FaFacebookF,
   FaXTwitter,
   FaLinkedinIn,
+  FaLocationDot,
+  FaPhone,
+  FaEnvelope,
+  FaMapLocationDot,
 } from "react-icons/fa6";
 import { FaZ } from "react-icons/fa6";
 import { SiSwiggy } from "react-icons/si";
@@ -26,11 +30,11 @@ const Footer = () => {
           <div className="flex items-center gap-2">
             <img
               src={food1}
-              alt="Nutriblend Logo"
+              alt="HungryCloud Logo"
               className="h-10 w-auto object-contain"
             />
             <h2 className="text-xl sm:text-2xl font-extrabold text-green-800">
-              Nutriblend
+              HungryCloud
             </h2>
           </div>
           <p className="text-gray-700 text-sm sm:text-base italic max-w-xs">
@@ -38,22 +42,21 @@ const Footer = () => {
           </p>
 
           {/* Social Icons */}
-          <div className="flex flex-wrap gap-3 mt-2 text-green-700">
+          <div className="flex flex-wrap gap-4 mt-2 text-green-700">
             <motion.a
               whileHover={{ scale: 1.2, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
-              href="https://wa.me/919090530409"
+              href="#"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 bg-white border border-green-200 rounded-full shadow hover:shadow-md transition"
             >
               <FaWhatsapp className="text-lg sm:text-xl" />
             </motion.a>
-
             <motion.a
               whileHover={{ scale: 1.2, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
-              href="https://www.instagram.com/nutriblend.fitfood?igsh=MXdveGhpYzh6MGxxaw=="
+              href="#"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 bg-white border border-green-200 rounded-full shadow hover:shadow-md transition"
@@ -68,44 +71,7 @@ const Footer = () => {
             >
               <FaFacebookF className="text-lg sm:text-xl" />
             </motion.a>
-            <motion.a
-              whileHover={{ scale: 1.2, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-              href="#"
-              className="p-2 bg-white border border-green-200 rounded-full shadow hover:shadow-md transition"
-            >
-              <FaXTwitter className="text-lg sm:text-xl" />
-            </motion.a>
-            <motion.a
-              whileHover={{ scale: 1.2, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-              href="#"
-              className="p-2 bg-white border border-green-200 rounded-full shadow hover:shadow-md transition"
-            >
-              <FaLinkedinIn className="text-lg sm:text-xl" />
-            </motion.a>
-          </div>
-
-          {/* Partners */}
-          <div className="flex flex-wrap gap-4 mt-4 items-center">
-            <a
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-pink-600 transition text-sm"
-            >
-              <FaZ className="text-pink-600" />
-              <span className="text-gray-600">Zomato</span>
-            </a>
-            <a
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-orange-500 transition text-sm"
-            >
-              <SiSwiggy className="text-orange-500" />
-              <span className="text-gray-600">Swiggy</span>
-            </a>
+            
           </div>
         </div>
 
@@ -135,27 +101,55 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Right: Newsletter */}
+        {/* Right: Location Details */}
         <div>
           <h3 className="text-lg sm:text-xl font-semibold text-green-800 mb-4">
-            JOIN OUR MAILING LIST
+            LOCATION DETAILS
           </h3>
-          <div className="flex flex-col gap-3">
-            <input
-              type="email"
-              placeholder="Email Address"
-              className="px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-green-400"
-            />
-            <button className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition shadow-md text-sm sm:text-base">
-              Subscribe
-            </button>
+          <div className="flex flex-col gap-3 text-sm sm:text-base text-gray-700">
+            <div className="flex items-start gap-2">
+              <FaLocationDot className="mt-0.5 text-green-700" />
+              <div>
+                <p className="font-semibold text-gray-800">Bhubaneswar, Odisha</p>
+                <p className="text-gray-600">India</p>
+              </div>
+            </div>
+
+            <a
+              href="tel:+919090530409"
+              className="inline-flex items-center gap-2 text-green-700 hover:underline hover:text-green-900"
+              aria-label="Call HungryCloud"
+            >
+              <FaPhone className="text-green-700" />
+              +91 9090530409
+            </a>
+
+            <a
+              href="mailto:support@hungrycloud.in"
+              className="inline-flex items-center gap-2 text-green-700 hover:underline hover:text-green-900"
+              aria-label="Email HungryCloud"
+            >
+              <FaEnvelope className="text-green-700" />
+              support@hungrycloud.in
+            </a>
+
+            <a
+              href="https://www.google.com/maps?q=Bhubaneswar,+Odisha,+India"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition shadow-md text-sm sm:text-base"
+              aria-label="Open HungryCloud location on map"
+            >
+              <FaMapLocationDot className="text-white" />
+              View on Map
+            </a>
           </div>
         </div>
       </div>
 
       {/* Bottom Bar */}
       <div className="text-center text-sm text-gray-600 py-6 border-t border-gray-200 px-4">
-        © 2025 <span className="text-green-800 font-semibold">Nutriblend</span>.
+        © 2025 <span className="text-green-800 font-semibold">HungryCloud</span>.
         All rights reserved.
         <br className="block sm:hidden" />
         Powered by{" "}
@@ -168,6 +162,7 @@ const Footer = () => {
           Cybknow Technology
         </a>
       </div>
+      
     </motion.footer>
   );
 };

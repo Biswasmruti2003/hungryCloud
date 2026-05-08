@@ -8,6 +8,13 @@ import { FaTimes, FaMapMarkerAlt } from "react-icons/fa";
 import { FaCrosshairs } from "react-icons/fa6";
 import api from "../api";
 
+const formatINR = (amount) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(Number(amount || 0));
+
 const planMealPrices = {
   "High Protein Plan": {
     "3 day": { veg: 249, nonVeg: 279 },
@@ -229,7 +236,7 @@ const SubscribeConfirm = () => {
     toast(
       () => (
         <div className="text-sm text-left">
-          <div className="font-bold text-green-700 mb-1">✅ Location Saved</div>
+          <div className="font-bold text-green-700 mb-1">Location Saved</div>
           <div>
             📍 <b>City:</b> {city}
           </div>
@@ -248,7 +255,7 @@ const SubscribeConfirm = () => {
           <div className="text-xs mt-1 text-gray-500">📍 Full: {full}</div>
         </div>
       ),
-      { duration: 6000 }
+      { autoClose: 6000 }
     );
 
     setShowLocationPopup(false);
@@ -533,183 +540,277 @@ const SubscribeConfirm = () => {
     }
   };
 
-
   return (
     <>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="min-h-screen bg-gradient-to-tr from-white via-green-50 to-white"
+        className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-lime-50"
       >
-        {/* Back */}
-        <div className="flex items-center px-4 sm:px-6 py-3 sm:py-4 border-b bg-white shadow-sm">
-          <button
-            onClick={() => navigate(-1)}
-            className="text-green-700 flex items-center gap-2 font-medium text-sm sm:text-base"
-          >
-            <FaArrowLeft /> Back
-          </button>
+        {/* Header */}
+        <div className="sticky top-0 z-20 border-b bg-white/80 backdrop-blur">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                onClick={() => navigate(-1)}
+                className="text-emerald-700 hover:text-emerald-800 flex items-center gap-2 font-semibold text-sm sm:text-base"
+              >
+                <FaArrowLeft /> Back
+              </button>
+              <div className="hidden sm:block h-6 w-px bg-gray-200" />
+              <div className="min-w-0">
+                <div className="text-sm text-gray-500">Confirm subscription</div>
+                <div className="font-bold text-gray-900 truncate">
+                  {selectedPlan}
+                </div>
+              </div>
+            </div>
+
+            <div className="text-right">
+              <div className="text-xs text-gray-500">Payable</div>
+              <div className="font-extrabold text-emerald-700">
+                {formatINR(totalPrice)}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10 p-4 sm:p-6 max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto p-4 sm:p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10">
           {/* Left Side */}
-          <div>
-            {/* Start Date */}
-            <motion.h2 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800">
-              Start Date
-            </motion.h2>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full border border-green-400 rounded px-3 sm:px-4 py-2 text-sm sm:text-base mb-4 sm:mb-6"
-            />
+          <div className="lg:col-span-7 space-y-6">
+            <section className="bg-white/80 backdrop-blur rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-base sm:text-lg font-bold text-gray-900">
+                    Start date
+                  </h2>
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    We’ll begin deliveries from this date.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-3">
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3 sm:px-4 py-2.5 text-sm sm:text-base outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+            </section>
 
             {/* Delivery Address */}
-            <motion.h2 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800">
-              Delivery Address
-            </motion.h2>
-
-            <div className="space-y-3 mb-3 sm:mb-4">
-              {addresses.map((addr, idx) => (
-                <motion.div
-                  key={idx}
-                  onClick={() => setSelectedAddressIndex(idx)}
-                  className={`border p-3 sm:p-4 rounded cursor-pointer break-words transition relative ${
-                    selectedAddressIndex === idx
-                      ? "border-green-500 bg-green-50"
-                      : "border-gray-200"
-                  }`}
+            <section className="bg-white/80 backdrop-blur rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-base sm:text-lg font-bold text-gray-900">
+                    Delivery address
+                  </h2>
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    Choose where you want the meals delivered.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowAddressForm((prev) => !prev);
+                    setEditingIndex(null);
+                    setNewAddrFields({ at: "", po: "", dist: "", pin: "" });
+                  }}
+                  className="shrink-0 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs sm:text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
                 >
-                  <div className="text-sm sm:text-base">
-                    <p><strong>At:</strong> {addr.at}</p>
-                    <p><strong>PO:</strong> {addr.po}</p>
-                    <p><strong>Dist:</strong> {addr.dist}</p>
-                    <p><strong>PIN:</strong> {addr.pin}</p>
-                  </div>
-                  <div className="absolute top-2 right-2 flex gap-1 sm:gap-2">
-                    {!addr._isLocal && (
-                      <FaEdit
-                        className="text-blue-500 cursor-pointer hover:scale-105"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setNewAddrFields(addr);
-                          setEditingIndex(idx);
-                          setShowAddressForm(true);
-                        }}
-                      />
-                    )}
-                    <FaTrash
-                      className="text-red-500 cursor-pointer hover:scale-105"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteAddress(addr.id || addr._id);
-                      }}
-                    />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                  {showAddressForm ? "Cancel" : "Add new"}
+                </button>
+              </div>
 
-            {/* Add Address Button */}
-            <button
-              onClick={() => {
-                setShowAddressForm((prev) => !prev);
-                setEditingIndex(null);
-                setNewAddrFields({ at: "", po: "", dist: "", pin: "" });
-              }}
-              className="text-xs sm:text-sm text-green-600 underline mb-3 sm:mb-4"
-            >
-              {showAddressForm ? "Cancel" : "➕ Add New Address"}
-            </button>
+              <div className="mt-4 grid grid-cols-1 gap-3">
+                {addresses.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-gray-300 bg-white p-4 text-sm text-gray-600">
+                    No saved addresses yet. Add one to continue.
+                  </div>
+                ) : (
+                  addresses.map((addr, idx) => {
+                    const isSelected = selectedAddressIndex === idx;
+                    return (
+                      <motion.button
+                        type="button"
+                        key={idx}
+                        onClick={() => setSelectedAddressIndex(idx)}
+                        whileHover={{ scale: 1.01 }}
+                        className={[
+                          "text-left w-full rounded-2xl border p-4 transition shadow-sm",
+                          isSelected
+                            ? "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200"
+                            : "border-gray-200 bg-white hover:border-emerald-200",
+                        ].join(" ")}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <div className="font-bold text-gray-900 truncate">
+                                {addr.at}
+                              </div>
+                              {addr._isLocal && (
+                                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 border border-blue-100">
+                                  Current location
+                                </span>
+                              )}
+                            </div>
+                            <div className="mt-1 text-xs sm:text-sm text-gray-600 break-words">
+                              {addr.po}, {addr.dist} - {addr.pin}
+                            </div>
+                          </div>
 
-            {/* Add Address Form */}
-            <AnimatePresence>
-              {showAddressForm && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="space-y-2 sm:space-y-3 mb-4"
-                >
-                  {["at", "po", "dist", "pin"].map((field) => (
-                    <input
-                      key={field}
-                      placeholder={field.toUpperCase()}
-                      value={newAddrFields[field]}
-                      onChange={(e) =>
-                        setNewAddrFields((prev) => ({
-                          ...prev,
-                          [field]: e.target.value,
-                        }))
-                      }
-                      className="w-full border px-2 sm:px-3 py-1.5 sm:py-2 rounded text-sm sm:text-base"
-                    />
-                  ))}
-                  <button
-                    onClick={handleAddOrEditAddress}
-                    className="w-full bg-green-500 text-white text-sm sm:text-base py-1.5 sm:py-2 rounded hover:bg-green-600"
+                          <div className="flex items-center gap-2">
+                            {!addr._isLocal && (
+                              <button
+                                type="button"
+                                className="rounded-full p-2 text-blue-600 hover:bg-blue-50"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setNewAddrFields(addr);
+                                  setEditingIndex(idx);
+                                  setShowAddressForm(true);
+                                }}
+                                aria-label="Edit address"
+                                title="Edit"
+                              >
+                                <FaEdit />
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              className="rounded-full p-2 text-red-600 hover:bg-red-50"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteAddress(addr.id || addr._id);
+                              }}
+                              aria-label="Delete address"
+                              title="Delete"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </div>
+                      </motion.button>
+                    );
+                  })
+                )}
+              </div>
+
+              <AnimatePresence>
+                {showAddressForm && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="mt-4 overflow-hidden"
                   >
-                    {editingIndex !== null ? "Update Address" : "Save Address"}
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    <div className="rounded-2xl border border-gray-200 bg-white p-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {["at", "po", "dist", "pin"].map((field) => (
+                          <div key={field} className="sm:col-span-1">
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">
+                              {field.toUpperCase()}
+                            </label>
+                            <input
+                              placeholder={
+                                field === "pin" ? "e.g. 751001" : "Enter"
+                              }
+                              value={newAddrFields[field]}
+                              onChange={(e) =>
+                                setNewAddrFields((prev) => ({
+                                  ...prev,
+                                  [field]: e.target.value,
+                                }))
+                              }
+                              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <button
+                        onClick={handleAddOrEditAddress}
+                        className="mt-4 w-full rounded-xl bg-emerald-600 text-white text-sm sm:text-base py-2.5 font-semibold hover:bg-emerald-700"
+                      >
+                        {editingIndex !== null
+                          ? "Update address"
+                          : "Save address"}
+                      </button>
+                      {message && (
+                        <p className="text-red-600 text-xs sm:text-sm mt-2">
+                          {message}
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </section>
           </div>
 
           {/* Right Side — Plan Card */}
-          <motion.div className="bg-green-50 p-4 sm:p-6 rounded-xl shadow-md space-y-4 sm:space-y-5">
-            <h2 className="text-lg sm:text-2xl font-bold text-green-700">
-              {selectedPlan}
-            </h2>
-            <p className="text-gray-500 text-xs sm:text-sm">
-              Subscribe to this plan
-            </p>
+          <motion.div className="lg:col-span-5">
+            <div className="lg:sticky lg:top-24 bg-white/90 backdrop-blur p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm space-y-5">
+              <div>
+                <h2 className="text-lg sm:text-2xl font-extrabold text-emerald-700">
+                  Order summary
+                </h2>
+                <p className="text-gray-500 text-xs sm:text-sm">
+                  Review your plan and confirm.
+                </p>
+              </div>
 
-            <Select label="Meal Option" value={mealOption} onChange={setMealOption} options={["Veg", "Non-Veg"]} />
-            <Select label="Slot" value={slot} onChange={setSlot} options={["Lunch", "Dinner", "Lunch + Dinner"]} />
-            <Select
-              label="Duration"
-              value={duration.label}
-              onChange={(val) => setDuration(dayOptions.find((d) => d.label === val))}
-              options={dayOptions.map((d) => d.label)}
-            />
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+                <div className="space-y-2 text-sm sm:text-base">
+                  <Row label="Meal option" value={mealOption} />
+                  <Row label="Slot" value={slot} />
+                  <Row label="Duration" value={duration.label} />
+                </div>
+              </div>
 
             {/* Coupon */}
             <div>
-              <label className="text-sm sm:text-base font-semibold">Coupon Code</label>
-              <div className="flex flex-col sm:flex-row mt-1 gap-2">
+              <label className="text-sm sm:text-base font-bold text-gray-900">
+                Coupon code
+              </label>
+              <div className="flex flex-col sm:flex-row mt-2 gap-2">
                 <input
                   type="text"
                   placeholder="e.g. MEAL100"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
-                  className="flex-grow border px-3 py-2 rounded text-sm sm:text-base"
+                  className="flex-grow rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm sm:text-base outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
                 <button
                   onClick={handleApplyCoupon}
-                  className="bg-green-600 text-white px-3 py-2 text-sm sm:text-base rounded hover:bg-green-700"
+                  className="rounded-xl bg-emerald-600 text-white px-4 py-2.5 text-sm sm:text-base font-semibold hover:bg-emerald-700"
                 >
                   Apply
                 </button>
               </div>
-              {discount > 0 && <p className="text-green-600 text-xs sm:text-sm mt-1">- ₹{discount}</p>}
-              {message && <p className="text-red-500 text-xs sm:text-sm mt-1">{message}</p>}
+              {discount > 0 && (
+                <p className="text-emerald-700 text-xs sm:text-sm mt-2 font-semibold">
+                  Discount applied: -{formatINR(discount)}
+                </p>
+              )}
             </div>
 
             {/* Payment Method */}
             <div>
-              <label className="text-sm sm:text-base font-semibold">Payment Method</label>
-              <div className="flex gap-3 mt-2">
+              <label className="text-sm sm:text-base font-bold text-gray-900">
+                Payment method
+              </label>
+              <div className="grid grid-cols-2 gap-3 mt-2">
                 {["COD", "Online"].map((mode) => (
                   <motion.div
                     key={mode}
                     onClick={() => setPaymentMode(mode)}
-                    className={`cursor-pointer px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg border ${
+                    className={`cursor-pointer px-3 py-2 text-sm sm:text-base rounded-xl border font-semibold text-center ${
                       paymentMode === mode
-                        ? "bg-green-600 text-white border-green-700"
-                        : "bg-white border-gray-300"
+                        ? "bg-emerald-600 text-white border-emerald-700"
+                        : "bg-white border-gray-200 hover:border-emerald-200"
                     }`}
                     whileHover={{ scale: 1.05 }}
                   >
@@ -720,16 +821,35 @@ const SubscribeConfirm = () => {
             </div>
 
             {/* Total */}
-            <div className="pt-4 border-t text-sm sm:text-base">
-              <p><strong>Total meals:</strong> {totalMeals}</p>
-              <p><strong>Price per meal:</strong> ₹{pricePerMeal}</p>
-              <h3 className="text-lg sm:text-xl font-bold mt-2">Total: ₹{totalPrice}</h3>
+            <div className="py-6 border-t border-gray-100 text-sm sm:text-base">
+              <div className="space-y-2 mb-6">
+                <Row label="Total meals" value={totalMeals} />
+                <Row label="Price per meal" value={formatINR(pricePerMeal)} />
+                <Row
+                  label="Subtotal"
+                  value={formatINR(calculatedTotal)}
+                  subtle
+                />
+                {discount > 0 && (
+                  <Row
+                    label="Discount"
+                    value={`- ${formatINR(discount)}`}
+                    highlight
+                  />
+                )}
+              </div>
+              <div className="mt-3 rounded-2xl bg-gray-50 border border-gray-100 p-4 flex items-center justify-between">
+                <div className="font-bold text-gray-900">Payable</div>
+                <div className="text-lg sm:text-xl font-extrabold text-emerald-700">
+                  {formatINR(totalPrice)}
+                </div>
+              </div>
             </div>
 
             <button
               disabled={loading}
               onClick={handleConfirm}
-              className="w-full mt-3 sm:mt-4 bg-green-700 text-white text-sm sm:text-base py-2 rounded-full hover:bg-green-800 disabled:opacity-50"
+              className="w-full mt-1 bg-emerald-700 text-white text-sm sm:text-base py-3 rounded-2xl hover:bg-emerald-800 disabled:opacity-50 font-semibold"
             >
               {loading
                 ? "Processing..."
@@ -737,7 +857,9 @@ const SubscribeConfirm = () => {
                 ? "Proceed to Payment"
                 : "Confirm Order"}
             </button>
+            </div>
           </motion.div>
+          </div>
         </div>
 
         <ToastContainer position="bottom-right" autoClose={3000} />
@@ -753,7 +875,7 @@ const SubscribeConfirm = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white w-full max-w-md rounded-xl shadow-xl relative text-gray-800 p-4 sm:p-6"
+              className="bg-white w-full max-w-md rounded-2xl shadow-xl relative text-gray-800 p-4 sm:p-6"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -761,10 +883,10 @@ const SubscribeConfirm = () => {
               <button onClick={() => setShowLocationPopup(false)} className="absolute top-2 right-2 text-gray-500 hover:text-red-600">
                 <FaTimes />
               </button>
-              <h2 className="text-lg sm:text-xl font-bold text-green-700 mb-2">Location Required</h2>
+              <h2 className="text-lg sm:text-xl font-extrabold text-emerald-700 mb-2">Location required</h2>
               <p className="text-xs sm:text-sm text-gray-600 mb-3">We need your location to deliver meals to your area.</p>
 
-              <div className="flex items-center gap-2 border p-2 rounded-lg mb-3">
+              <div className="flex items-center gap-2 border border-gray-200 p-3 rounded-xl mb-3">
                 <FaMapMarkerAlt className="text-gray-500 text-sm sm:text-base" />
                 <input
                   type="text"
@@ -778,7 +900,7 @@ const SubscribeConfirm = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 onClick={handleManualSubmit}
-                className="w-full text-xs sm:text-sm bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold mb-2"
+                className="w-full text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-semibold mb-2"
               >
                 Submit Location
               </motion.button>
@@ -786,7 +908,7 @@ const SubscribeConfirm = () => {
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={handleUseCurrentLocation}
-                className="w-full flex items-center justify-center gap-2 text-xs sm:text-sm border border-green-500 text-green-700 py-2 rounded-lg font-semibold"
+                className="w-full flex items-center justify-center gap-2 text-xs sm:text-sm border border-emerald-500 text-emerald-700 py-2.5 rounded-xl font-semibold"
               >
                 <FaCrosshairs /> Use Current Location
               </motion.button>
@@ -798,20 +920,16 @@ const SubscribeConfirm = () => {
   );
 };
 
-const Select = ({ label, value, onChange, options }) => (
-  <div>
-    <label className="text-sm sm:text-base font-semibold">{label}</label>
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full border px-2 sm:px-3 py-1.5 sm:py-2 rounded mt-1 text-sm sm:text-base"
-    >
-      {options.map((opt) => (
-        <option key={opt} value={opt}>
-          {opt}
-        </option>
-      ))}
-    </select>
+const Row = ({ label, value, subtle, highlight }) => (
+  <div
+    className={[
+      "flex items-center justify-between gap-4",
+      subtle ? "text-gray-500" : "text-gray-800",
+      highlight ? "text-emerald-700 font-semibold" : "",
+    ].join(" ")}
+  >
+    <div>{label}</div>
+    <div className="font-semibold">{value}</div>
   </div>
 );
 
