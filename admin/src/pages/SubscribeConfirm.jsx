@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaArrowLeft, FaEdit, FaTrash } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaCreditCard,
+  FaEdit,
+  FaMapMarkerAlt,
+  FaMoneyBillWave,
+  FaPlus,
+  FaTimes,
+  FaTrash,
+} from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaTimes, FaMapMarkerAlt } from "react-icons/fa";
 import { FaCrosshairs } from "react-icons/fa6";
 import api from "../api";
 
@@ -58,6 +66,11 @@ const dayOptions = [
   { label: "7 day", days: 7 },
   { label: "21 day", days: 21 },
   { label: "28 day", days: 28 },
+];
+
+const paymentMethodOptions = [
+  { mode: "COD", label: "Cash on delivery", Icon: FaMoneyBillWave },
+  { mode: "Online", label: "Online", Icon: FaCreditCard },
 ];
 
 const dayNameToIndex = {
@@ -605,7 +618,11 @@ const SubscribeConfirm = () => {
             <section className="bg-white/80 backdrop-blur rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-base sm:text-lg font-bold text-gray-900">
+                  <h2 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <FaMapMarkerAlt
+                      className="text-emerald-600 shrink-0"
+                      aria-hidden
+                    />
                     Delivery address
                   </h2>
                   <p className="text-xs sm:text-sm text-gray-500">
@@ -618,8 +635,11 @@ const SubscribeConfirm = () => {
                     setEditingIndex(null);
                     setNewAddrFields({ at: "", po: "", dist: "", pin: "" });
                   }}
-                  className="shrink-0 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs sm:text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
+                  className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs sm:text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
                 >
+                  {!showAddressForm && (
+                    <FaPlus className="text-xs sm:text-sm" aria-hidden />
+                  )}
                   {showAddressForm ? "Cancel" : "Add new"}
                 </button>
               </div>
@@ -641,7 +661,7 @@ const SubscribeConfirm = () => {
                         className={[
                           "text-left w-full rounded-2xl border p-4 transition shadow-sm",
                           isSelected
-                            ? "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200"
+                            ? "border-emerald-500 bg-emerald-50 ring-emerald-200"
                             : "border-gray-200 bg-white hover:border-emerald-200",
                         ].join(" ")}
                       >
@@ -662,7 +682,7 @@ const SubscribeConfirm = () => {
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2">
+                          <div className="flex shrink-0 items-center gap-2">
                             {!addr._isLocal && (
                               <button
                                 type="button"
@@ -752,7 +772,7 @@ const SubscribeConfirm = () => {
 
           {/* Right Side — Plan Card */}
           <motion.div className="lg:col-span-5">
-            <div className="lg:sticky lg:top-24 bg-white/90 backdrop-blur p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm space-y-5">
+            <div className="lg:sticky lg:top-24 bg-white/90 backdrop-blur p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
               <div>
                 <h2 className="text-lg sm:text-2xl font-extrabold text-emerald-700">
                   Order summary
@@ -803,18 +823,27 @@ const SubscribeConfirm = () => {
                 Payment method
               </label>
               <div className="grid grid-cols-2 gap-3 mt-2">
-                {["COD", "Online"].map((mode) => (
+                {paymentMethodOptions.map(({ mode, label, Icon }) => (
                   <motion.div
                     key={mode}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setPaymentMode(mode)}
-                    className={`cursor-pointer px-3 py-2 text-sm sm:text-base rounded-xl border font-semibold text-center ${
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setPaymentMode(mode);
+                      }
+                    }}
+                    className={`cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-2 px-3 py-2.5 text-sm sm:text-base rounded-xl border font-semibold text-center ${
                       paymentMode === mode
                         ? "bg-emerald-600 text-white border-emerald-700"
                         : "bg-white border-gray-200 hover:border-emerald-200"
                     }`}
                     whileHover={{ scale: 1.05 }}
                   >
-                    {mode}
+                    <Icon className="text-lg shrink-0" aria-hidden />
+                    <span className="leading-tight">{label}</span>
                   </motion.div>
                 ))}
               </div>
