@@ -129,6 +129,11 @@ const Navbar = () => {
     }
   };
 
+  const handleAdminLoginClick = () => {
+    setMenuOpen(false);
+    navigate("/admin-login");
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-md">
       <nav className="max-w-7xl mx-auto flex items-center justify-between px-3 sm:px-4 py-3 sm:py-4">
@@ -196,6 +201,15 @@ const Navbar = () => {
             </span>
           </div>
 
+          {/* Admin Login Button */}
+          <button
+            type="button"
+            onClick={handleAdminLoginClick}
+            className="hidden md:inline-flex items-center px-3 py-1.5 rounded-full border border-green-600 text-green-700 hover:bg-green-50 hover:text-green-800 text-xs sm:text-sm font-semibold"
+          >
+            Admin Login
+          </button>
+
           {/* Mobile Menu Button */}
           <div
             className="md:hidden cursor-pointer text-green-700"
@@ -246,6 +260,15 @@ const Navbar = () => {
               {user?.phone || user?.email || "Profile"}
             </span>
           </div>
+
+          {/* Admin Login Mobile */}
+          <button
+            type="button"
+            onClick={handleAdminLoginClick}
+            className="w-full text-left text-gray-700 font-medium border-t pt-4 hover:text-green-700"
+          >
+            Admin Login
+          </button>
         </div>
       )}
 
