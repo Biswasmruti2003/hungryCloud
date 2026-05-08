@@ -12,13 +12,13 @@ const avatarUrls = [
 const testimonials = [
   {
     name: "Ratna Kumar Sahoo",
-    text: "You do not have to cook fancy or complicated masterpieces. Just good food from fresh ingredients... Cheers to Nutriblend!",
+    text: "You do not have to cook fancy or complicated masterpieces. Just good food from fresh ingredients... Cheers to HungryCloud!",
     avatar: avatarUrls[0],
     rating: 5,
   },
   {
     name: "Pravat Biswal",
-    text: "Have been eating unhealthy and fried food for a couple of days. One meal from Nutriblend and I feel so much better already.",
+    text: "Have been eating unhealthy and fried food for a couple of days. One meal from HungryCloud and I feel so much better already.",
     avatar: avatarUrls[1],
     rating: 5,
   },
@@ -36,7 +36,7 @@ const testimonials = [
   },
   {
     name: "Priya Reddy",
-    text: "The variety in the menu is great. I never feel bored eating from Nutriblend. Every delivery is fresh and delicious.",
+    text: "The variety in the menu is great. I never feel bored eating from HungryCloud. Every delivery is fresh and delicious.",
     avatar: avatarUrls[4],
     rating: 5,
   },
@@ -135,10 +135,10 @@ export default function Testimonials() {
   const visibleIndices = getVisibleIndices();
 
   return (
-    <section className="w-full py-10 bg-white">
-      <div className="flex flex-col items-center">
+    <section className="w-full py-16 bg-white">
+      <div className="flex flex-col items-center mb-6">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-2">TESTIMONIALS</h2>
-        <div className="w-40 border-t-2 border-green-300 rounded mx-auto mb-8"></div>
+        <div className="w-40 border-t-2 border-green-300 rounded mx-auto mb-12"></div>
       </div>
 
       <div className="relative flex justify-center items-center">

@@ -33,11 +33,11 @@ const cards = [
 
 export default function WhyChooseUs() {
   return (
-    <section className="w-full min-h-screen bg-gradient-to-br from-gray-100 to-white flex flex-col items-center py-10 px-4 sm:px-6 md:px-10">
+    <section className="w-full  bg-gradient-to-br from-gray-100 to-white flex flex-col items-center gap-10 py-20 px-4 sm:px-6 md:px-10">
       <h2 className="font-extrabold text-3xl sm:text-4xl lg:text-5xl text-gray-800 mb-8 text-center underline decoration-green-400 decoration-4">
-        WHY NUTRIBLEND?
+        WHY HUNGRYCLOUD?
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8 w-full max-w-6xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-12 w-full max-w-5xl">
         {cards.map((card, idx) => (
           <div
             key={idx}

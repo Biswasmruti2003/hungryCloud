@@ -52,7 +52,7 @@ app.use("/api/admin", require("./routes/admin"));           // Admin Routes
 
 // ✅ Health Check
 app.get("/", (req, res) => {
-  res.send("🌱 Nutriblend Backend API Running ✅");
+  res.send("☁️ HungryCloud Backend API Running ✅");
 });
 
 // ✅ Global Error Handler

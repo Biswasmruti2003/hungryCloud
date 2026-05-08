@@ -21,7 +21,7 @@ const About = () => {
           transition={{ duration: 0.6 }}
           className="text-4xl md:text-5xl font-bold text-green-800 mb-6 text-center"
         >
-          About NutriBlend
+          About HungryCloud
         </motion.h1>
 
         <motion.p
@@ -30,7 +30,7 @@ const About = () => {
           transition={{ delay: 0.4, duration: 0.6 }}
           className="text-gray-700 md:text-lg leading-relaxed mb-8"
         >
-          NutriBlend is more than a meal subscription platform — it's your companion on the journey toward a healthier, simpler lifestyle. We combine <span className="text-green-600 font-medium">personalized nutrition</span>, <span className="text-orange-600 font-medium">chef-crafted meals</span>, and <span className="text-green-600 font-medium">science-backed plans</span> to help you achieve your fitness and wellness goals.
+          HungryCloud is more than a meal subscription platform — it's your companion on the journey toward a healthier, simpler lifestyle. We combine <span className="text-green-600 font-medium">personalized nutrition</span>, <span className="text-orange-600 font-medium">chef-crafted meals</span>, and <span className="text-green-600 font-medium">science-backed plans</span> to help you achieve your fitness and wellness goals.
         </motion.p>
 
         <motion.div

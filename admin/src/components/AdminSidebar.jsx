@@ -13,11 +13,11 @@ const navItems = [
   { label: "Dashboard", icon: FaTachometerAlt, to: "/admin", exact: true },
   { label: "Users", icon: FaUser, to: "/admin/users" },
   { label: "Subscriptions", icon: FaClipboardList, to: "/admin/subscriptions" },
-  { label: "Plans", icon: MdFastfood, to: "/admin/plans" },
-  { label: "Coupons", icon: FaTags, to: "/admin/coupons" },
-  { label: "Transactions", icon: MdPayment, to: "/admin/transactions" },
-  { label: "Revenue", icon: FaChartLine, to: "/admin/revenue" },
-  { label: "Settings", icon: FaCog, to: "/admin/settings" },
+  // { label: "Plans", icon: MdFastfood, to: "/admin/plans" },
+  // { label: "Coupons", icon: FaTags, to: "/admin/coupons" },
+  // { label: "Transactions", icon: MdPayment, to: "/admin/transactions" },
+  // { label: "Revenue", icon: FaChartLine, to: "/admin/revenue" },
+  // { label: "Settings", icon: FaCog, to: "/admin/settings" },
 ];
 
 const AdminSidebar = () => {
