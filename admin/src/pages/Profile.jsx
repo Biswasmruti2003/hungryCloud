@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
-  FaUserCircle,
   FaPhone,
   FaEnvelope,
   FaSignOutAlt,
@@ -10,6 +9,10 @@ import {
   FaEdit,
   FaSave,
   FaTimes,
+  FaReceipt,
+  FaLayerGroup,
+  FaMapMarkerAlt,
+  FaDownload,
 } from "react-icons/fa";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -440,49 +443,87 @@ const Profile = () => {
       ? `${addr?.at}, ${addr?.po}, ${addr?.dist} - ${addr?.pin}`
       : "No address info";
 
+  const activePlanCount = subscriptions.filter(
+    (s) => s.status?.toLowerCase() === "active"
+  ).length;
+
+  const profileInitials = user?.name
+    ? user.name
+        .trim()
+        .split(/\s+/)
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "HC";
+
+  const filterTabs = [
+    { id: "all", label: "All plans" },
+    { id: "active", label: "Active" },
+    { id: "expired", label: "Cancelled" },
+  ];
+
   if (loading) {
     return (
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="text-gray-600 font-medium">Loading profile...</div>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-4 px-4">
+        <div
+          className="h-11 w-11 rounded-full border-2 border-emerald-200 border-t-emerald-600 animate-spin"
+          aria-hidden
+        />
+        <p className="text-sm font-medium text-slate-600">Loading your profile…</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-10 px-4 md:px-20 bg-gradient-to-br from-green-50 via-white to-orange-50">
-      <ToastContainer position="top-right" autoClose={3000} />
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50/90 via-white to-amber-50/50">
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
 
-      {/* Delete Modal */}
       <AnimatePresence>
         {showDeleteModal && (
           <motion.div
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            role="presentation"
           >
             <motion.div
-              className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
+              className="relative z-[201] w-full max-w-md rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xl shadow-slate-900/10"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="delete-account-title"
+              initial={{ scale: 0.94, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.94, opacity: 0 }}
+              transition={{ type: "spring", damping: 26, stiffness: 320 }}
             >
-              <h2 className="text-xl font-semibold text-red-600 mb-2">Delete Account</h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Are you sure you want to delete your account? This action cannot be undone.
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100 text-red-600">
+                <FaTrash className="text-lg" />
+              </div>
+              <h2
+                id="delete-account-title"
+                className="mt-4 text-lg font-semibold tracking-tight text-slate-900"
+              >
+                Delete account?
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                This permanently removes your profile and access. This cannot be undone.
               </p>
-              <div className="flex justify-end gap-2 mt-4">
+              <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <button
+                  type="button"
                   onClick={() => setShowDeleteModal(false)}
-                  className="px-4 py-1.5 rounded bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={confirmDelete}
-                  className="px-4 py-1.5 rounded bg-red-600 text-white hover:bg-red-700"
+                  className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
                 >
-                  Confirm
+                  Yes, delete
                 </button>
               </div>
             </motion.div>
@@ -490,195 +531,358 @@ const Profile = () => {
         )}
       </AnimatePresence>
 
-      {/* Profile Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 space-y-6"
-      >
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start justify-between border-b pb-4 gap-4">
-          <div className="flex gap-4 items-start">
-            <FaUserCircle className="text-green-700 text-4xl mt-1" />
-            <div className="space-y-1">
-              {!editMode ? (
-                <>
-                  <h2 className="text-xl font-semibold text-green-800">Welcome, {user?.name}</h2>
-                  <p className="text-sm text-gray-600 flex items-center gap-2">
-                    <FaPhone className="text-green-500" /> {user?.phone}
-                  </p>
-                  <p className="text-sm text-gray-600 flex items-center gap-2">
-                    <FaEnvelope className="text-green-500" /> {user?.email}
-                  </p>
-                </>
-              ) : (
-                <div className="space-y-2">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className="space-y-8"
+        >
+          {/* Hero card */}
+          <section className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 shadow-xl shadow-emerald-900/5 backdrop-blur-sm">
+            <div className="h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-400" />
+            <div className="flex flex-col gap-8 p-6 sm:p-8 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex flex-1 flex-col gap-6 sm:flex-row sm:items-start">
+                <div
+                  className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-600 text-xl font-bold tracking-tight text-white shadow-lg shadow-emerald-600/25 ring-4 ring-white"
+                  aria-hidden
+                >
+                  {profileInitials}
+                </div>
+                <div className="min-w-0 flex-1 space-y-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">Name</label>
-                    <input
-                      value={form.name}
-                      onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                      className="w-full sm:w-80 border px-3 py-2 rounded-md text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200"
-                      placeholder="Your name"
-                      disabled={saving}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">Phone</label>
-                    <input
-                      value={form.phone}
-                      onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                      className="w-full sm:w-80 border px-3 py-2 rounded-md text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200"
-                      placeholder="10-digit phone"
-                      inputMode="numeric"
-                      disabled={saving}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">Email</label>
-                    <input
-                      value={form.email}
-                      onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                      className="w-full sm:w-80 border px-3 py-2 rounded-md text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200"
-                      placeholder="you@example.com"
-                      inputMode="email"
-                      disabled={saving}
-                    />
+                    <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700/90">
+                      Your account
+                    </p>
+                    {!editMode ? (
+                      <>
+                        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+                          {user?.name}
+                        </h1>
+                        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+                          <span className="inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-slate-50/80 px-3 py-1.5 text-sm text-slate-700">
+                            <FaPhone className="text-emerald-600" aria-hidden />
+                            {user?.phone}
+                          </span>
+                          <span className="inline-flex min-w-0 items-center gap-2 rounded-full border border-slate-200/90 bg-slate-50/80 px-3 py-1.5 text-sm text-slate-700">
+                            <FaEnvelope className="shrink-0 text-emerald-600" aria-hidden />
+                            <span className="truncate">{user?.email}</span>
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="mt-3 grid max-w-xl gap-4 sm:grid-cols-1">
+                        <div>
+                          <label className="mb-1.5 block text-xs font-semibold text-slate-600">
+                            Name
+                          </label>
+                          <input
+                            value={form.name}
+                            onChange={(e) =>
+                              setForm((p) => ({ ...p, name: e.target.value }))
+                            }
+                            className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200/60"
+                            placeholder="Your name"
+                            disabled={saving}
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1.5 block text-xs font-semibold text-slate-600">
+                            Phone
+                          </label>
+                          <input
+                            value={form.phone}
+                            onChange={(e) =>
+                              setForm((p) => ({ ...p, phone: e.target.value }))
+                            }
+                            className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200/60"
+                            placeholder="10-digit phone"
+                            inputMode="numeric"
+                            disabled={saving}
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1.5 block text-xs font-semibold text-slate-600">
+                            Email
+                          </label>
+                          <input
+                            value={form.email}
+                            onChange={(e) =>
+                              setForm((p) => ({ ...p, email: e.target.value }))
+                            }
+                            className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200/60"
+                            placeholder="you@example.com"
+                            inputMode="email"
+                            disabled={saving}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
 
-          <div className="flex items-center gap-2">
-            {!editMode ? (
-              <button
-                onClick={startEdit}
-                className="text-sm px-4 py-2 bg-green-50 text-green-700 border border-green-200 rounded hover:bg-green-100 flex items-center gap-2 justify-center"
-              >
-                <FaEdit /> Edit
-              </button>
-            ) : (
-              <>
-                <button
-                  onClick={saveProfile}
-                  disabled={saving}
-                  className="text-sm px-4 py-2 bg-green-600 text-white border border-green-700 rounded hover:bg-green-700 disabled:opacity-60 flex items-center gap-2 justify-center"
-                >
-                  <FaSave /> {saving ? "Saving..." : "Save"}
-                </button>
-                <button
-                  onClick={cancelEdit}
-                  disabled={saving}
-                  className="text-sm px-4 py-2 bg-gray-100 text-gray-700 border border-gray-200 rounded hover:bg-gray-200 disabled:opacity-60 flex items-center gap-2 justify-center"
-                >
-                  <FaTimes /> Cancel
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-4 border rounded-xl bg-orange-50 shadow-inner text-center">
-            <h4 className="text-sm text-gray-600 font-semibold mb-2">Meal Progress</h4>
-            <div className="w-24 h-24 mx-auto">
-              <CircularProgressbar
-                value={credits}
-                maxValue={100}
-                text={`${credits}%`}
-                styles={buildStyles({ textColor: "#166534", pathColor: "#22c55e" })}
-              />
-            </div>
-            <p className="text-xs text-gray-500 mt-2">Credits Remaining</p>
-          </div>
-          <div className="p-4 border rounded-xl bg-green-50 shadow-inner">
-            <h4 className="text-sm font-semibold text-gray-600 mb-2">Summary</h4>
-            <ul className="text-sm text-gray-700 space-y-1">
-              <li>Active Plans: <strong>{subscriptions.filter(s => s.status?.toLowerCase() === "active").length}</strong></li>
-              <li>Total Transactions: <strong>{transactions.length}</strong></li>
-              <li>Credits: <strong>{credits}</strong></li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Subscription Filters */}
-        <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-2">
-          <h3 className="text-lg font-semibold text-green-800">Your Subscriptions</h3>
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="border px-3 py-1.5 rounded text-sm bg-white shadow"
-          >
-            <option value="all">All</option>
-            <option value="active">Active</option>
-            <option value="expired">Cancelled</option>
-          </select>
-        </div>
-
-        {/* Subscription List */}
-        {filteredSubscriptions.length > 0 ? (
-          <ul className="space-y-3">
-            {filteredSubscriptions.map((sub, idx) => (
-              <motion.li
-                key={sub._id || idx}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.06 }}
-                className={`relative border-l-4 p-4 pb-14 rounded-md shadow-md bg-white ${
-                  sub.status?.toLowerCase() === "cancelled"
-                    ? "border-red-400"
-                    : "border-green-400"
-                }`}
-              >
-                <div className="flex justify-between items-start">
-                  <h4 className="text-md font-semibold mb-1 text-gray-800">
-                    {sub.plan ? sub.plan.toString().trim() : "Unnamed Plan"}
-                  </h4>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full font-medium ${
-                      sub.status?.toLowerCase() === "cancelled"
-                        ? "bg-red-100 text-red-700 border border-red-300"
-                        : "bg-green-100 text-green-700 border border-green-300"
-                    }`}
+              <div className="flex flex-wrap gap-2 lg:shrink-0 lg:justify-end">
+                {!editMode ? (
+                  <button
+                    type="button"
+                    onClick={startEdit}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100"
                   >
-                    {sub.status?.charAt(0).toUpperCase() + sub.status?.slice(1)}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-700"><strong>Meal Option:</strong> {sub.mealOption || "N/A"}</p>
-                <p className="text-sm text-gray-700"><strong>Duration:</strong> {sub.duration}</p>
-                <p className="text-sm text-gray-700"><strong>Start Date:</strong> {new Date(sub.startDate).toLocaleDateString()}</p>
-                <p className="text-sm text-gray-700"><strong>Time of Subscription:</strong> {new Date(sub.confirmedAt || sub.createdAt).toLocaleString()}</p>
-                <p className="text-sm text-gray-700"><strong>Address:</strong> {formatAddress(sub.address)}</p>
-                <p className="text-sm text-gray-700"><strong>Amount:</strong> {formatINR(sub.totalPrice)}</p>
-
+                    <FaEdit /> Edit profile
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={saveProfile}
+                      disabled={saving}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <FaSave /> {saving ? "Saving…" : "Save changes"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={cancelEdit}
+                      disabled={saving}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <FaTimes /> Cancel
+                    </button>
+                  </>
+                )}
                 <button
                   type="button"
-                  onClick={() => handleDownloadReceipt(sub)}
-                  className="absolute bottom-4 right-4 text-xs sm:text-sm px-3 py-1.5 rounded bg-green-600 text-white hover:bg-green-700"
+                  onClick={handleLogout}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-100"
                 >
-                  Download Receipt
+                  <FaSignOutAlt /> Log out
                 </button>
-              </motion.li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-gray-500 mt-2">No subscriptions found.</p>
-        )}
+              </div>
+            </div>
+          </section>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row justify-center gap-3 pt-6 border-t mt-6">
-          <button
-            onClick={handleLogout}
-            className="text-sm px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded hover:bg-red-100 flex items-center gap-2 justify-center"
-          >
-            <FaSignOutAlt /> Logout
-          </button>
-         
-        </div>
-      </motion.div>
+          {/* Stats */}
+          <section className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Meal credits
+              </p>
+              <div className="mt-4 flex items-center gap-5">
+                <div className="h-20 w-20 shrink-0">
+                  <CircularProgressbar
+                    value={credits}
+                    maxValue={100}
+                    text={`${credits}%`}
+                    styles={buildStyles({
+                      textSize: "28px",
+                      textColor: "#0f172a",
+                      pathColor: "#059669",
+                      trailColor: "#ecfdf5",
+                    })}
+                  />
+                </div>
+                <div>
+                  <p className="text-2xl font-semibold tabular-nums text-slate-900">{credits}</p>
+                  <p className="text-sm text-slate-500">of 100 remaining</p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <FaLayerGroup className="text-emerald-600" aria-hidden />
+                Active plans
+              </div>
+              <p className="mt-4 text-3xl font-semibold tabular-nums text-slate-900">
+                {activePlanCount}
+              </p>
+              <p className="mt-1 text-sm text-slate-500">Currently subscribed</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <FaReceipt className="text-amber-600" aria-hidden />
+                Transactions
+              </div>
+              <p className="mt-4 text-3xl font-semibold tabular-nums text-slate-900">
+                {transactions.length}
+              </p>
+              <p className="mt-1 text-sm text-slate-500">All-time count</p>
+            </div>
+          </section>
+
+          {/* Subscriptions */}
+          <section className="rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-lg shadow-slate-900/5 sm:p-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
+                  Subscriptions
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Plans, delivery details, and receipts in one place.
+                </p>
+              </div>
+              <div className="hidden flex-wrap items-center gap-2 rounded-2xl bg-slate-100/80 p-1 sm:flex">
+                {filterTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setFilter(tab.id)}
+                    className={`rounded-xl px-3.5 py-2 text-sm font-medium transition ${
+                      filter === tab.id
+                        ? "bg-white text-slate-900 shadow-sm"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-4 sm:hidden">
+              <label htmlFor="sub-filter" className="sr-only">
+                Filter subscriptions
+              </label>
+              <select
+                id="sub-filter"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200/60"
+              >
+                <option value="all">All plans</option>
+                <option value="active">Active</option>
+                <option value="expired">Cancelled</option>
+              </select>
+            </div>
+
+            {filteredSubscriptions.length > 0 ? (
+              <ul className="mt-4 space-y-4 sm:mt-6">
+                {filteredSubscriptions.map((sub, idx) => {
+                  const cancelled = sub.status?.toLowerCase() === "cancelled";
+                  return (
+                    <motion.li
+                      key={sub._id || idx}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05, duration: 0.35 }}
+                      className={`group relative overflow-hidden rounded-2xl border bg-white transition hover:shadow-md ${
+                        cancelled
+                          ? "border-red-200/90"
+                          : "border-emerald-200/80 hover:border-emerald-300"
+                      }`}
+                    >
+                      <div
+                        className={`absolute left-0 top-0 h-full w-1 ${
+                          cancelled ? "bg-red-500" : "bg-emerald-500"
+                        }`}
+                        aria-hidden
+                      />
+                      <div className="p-5 pl-6 sm:p-6 sm:pl-7">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="min-w-0">
+                            <h3 className="text-base font-semibold text-slate-900 sm:text-lg">
+                              {sub.plan ? sub.plan.toString().trim() : "Unnamed Plan"}
+                            </h3>
+                            <p className="mt-1 text-sm text-slate-500">
+                              Subscribed{" "}
+                              {new Date(sub.confirmedAt || sub.createdAt).toLocaleString()}
+                            </p>
+                          </div>
+                          <span
+                            className={`inline-flex w-fit shrink-0 items-center rounded-full px-3 py-1 text-xs font-semibold ${
+                              cancelled
+                                ? "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200"
+                                : "bg-emerald-50 text-emerald-800 ring-1 ring-inset ring-emerald-200"
+                            }`}
+                          >
+                            {sub.status?.charAt(0).toUpperCase() + sub.status?.slice(1)}
+                          </span>
+                        </div>
+
+                        <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
+                          <div className="rounded-xl bg-slate-50/80 px-3 py-2">
+                            <dt className="text-xs font-medium text-slate-500">Meal option</dt>
+                            <dd className="mt-0.5 font-medium text-slate-900">
+                              {sub.mealOption || "N/A"}
+                            </dd>
+                          </div>
+                          <div className="rounded-xl bg-slate-50/80 px-3 py-2">
+                            <dt className="text-xs font-medium text-slate-500">Duration</dt>
+                            <dd className="mt-0.5 font-medium text-slate-900">{sub.duration}</dd>
+                          </div>
+                          <div className="rounded-xl bg-slate-50/80 px-3 py-2">
+                            <dt className="text-xs font-medium text-slate-500">Start date</dt>
+                            <dd className="mt-0.5 font-medium text-slate-900">
+                              {new Date(sub.startDate).toLocaleDateString()}
+                            </dd>
+                          </div>
+                          <div className="rounded-xl bg-slate-50/80 px-3 py-2">
+                            <dt className="text-xs font-medium text-slate-500">Amount</dt>
+                            <dd className="mt-0.5 font-semibold text-slate-900">
+                              {formatINR(sub.totalPrice)}
+                            </dd>
+                          </div>
+                          <div className="sm:col-span-2">
+                            <div className="flex items-start gap-2 rounded-xl bg-slate-50/80 px-3 py-2">
+                              <FaMapMarkerAlt
+                                className="mt-0.5 shrink-0 text-emerald-600"
+                                aria-hidden
+                              />
+                              <div>
+                                <dt className="text-xs font-medium text-slate-500">Address</dt>
+                                <dd className="mt-0.5 text-slate-800">
+                                  {formatAddress(sub.address)}
+                                </dd>
+                              </div>
+                            </div>
+                          </div>
+                        </dl>
+
+                        <div className="mt-5 flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-4">
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadReceipt(sub)}
+                            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+                          >
+                            <FaDownload className="text-xs" aria-hidden />
+                            Download receipt
+                          </button>
+                        </div>
+                      </div>
+                    </motion.li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <div className="mt-8 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 px-6 py-12 text-center">
+                <FaLayerGroup className="mx-auto text-3xl text-slate-300" aria-hidden />
+                <p className="mt-3 text-sm font-medium text-slate-700">No subscriptions yet</p>
+                <p className="mt-1 text-sm text-slate-500">
+                  When you subscribe to a plan, it will show up here with receipts.
+                </p>
+              </div>
+            )}
+          </section>
+
+          {/* Danger zone */}
+          <section className="rounded-3xl border border-red-200/80 bg-red-50/40 p-6 sm:p-8">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-red-800">
+              Danger zone
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm text-red-900/80">
+              Deleting your account removes your profile and cannot be reversed.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(true)}
+              className="mt-4 inline-flex items-center gap-2 rounded-xl border border-red-300 bg-white px-4 py-2.5 text-sm font-semibold text-red-700 shadow-sm transition hover:bg-red-50"
+            >
+              <FaTrash className="text-xs" aria-hidden />
+              Delete account
+            </button>
+          </section>
+        </motion.div>
+      </div>
     </div>
   );
 };

@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const authenticate = require("../middleware/authenticate");
 const Subscription = require("../models/Subscription");
+const {
+  sendSubscriptionNotificationEmail,
+} = require("../utils/sendSubscriptionNotificationEmail");
 
 // POST / — Create a new subscription (COD or Online)
 router.post("/", authenticate, async (req, res) => {
@@ -83,10 +86,24 @@ router.post("/", authenticate, async (req, res) => {
 
     await newSub.save();
 
+    const emailNotification = await sendSubscriptionNotificationEmail(
+      req.user,
+      newSub
+    );
+
     return res.json({
       success: true,
       message: "Subscription saved successfully",
       subscriptionId: newSub._id,
+      emailNotification: {
+        sent: emailNotification.sent,
+        ...(emailNotification.sent
+          ? {
+              to: emailNotification.to,
+              orderRef: emailNotification.orderRef,
+            }
+          : { reason: emailNotification.reason }),
+      },
     });
 
   } catch (err) {

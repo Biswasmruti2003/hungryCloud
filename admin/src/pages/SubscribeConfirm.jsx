@@ -15,6 +15,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCrosshairs } from "react-icons/fa6";
 import api from "../api";
+import { notifyEmailResult } from "../utils/emailNotificationToast";
 
 const formatINR = (amount) =>
   new Intl.NumberFormat("en-IN", {
@@ -539,8 +540,9 @@ const SubscribeConfirm = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       if (res.data.success) {
-        toast.success("🎉 Order Confirmed!");
-        setTimeout(() => navigate("/profile"), 1500);
+        toast.success("Order confirmed — thank you!");
+        notifyEmailResult(res.data.emailNotification);
+        setTimeout(() => navigate("/profile"), 1800);
       } else {
         setMessage("Subscription failed. Try again.");
         toast.error("Subscription failed. Try again.");
